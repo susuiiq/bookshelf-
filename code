@@ -1,0 +1,225 @@
+import java.util.Scanner;
+
+/**
+ * Virtual Bookshelf
+ * ------------------
+ * A simple console app where you pick a "shelf" (genre), add books to it
+ * with a title, author, star rating (0-5, half stars allowed), and an
+ * optional review, then browse what you've collected.
+ *
+ * Built using only: Scanner, arrays, loops, if/else, switch, and methods.
+ */
+public class VirtualBookshelf {
+
+    static final int MAX_BOOKS = 100;
+    static String[] shelves = {"Fantasy", "Romance", "Sci-Fi", "Mystery", "Non-Fiction"};
+
+    // Parallel arrays: index i in each array describes the same book
+    static String[] bookTitle = new String[MAX_BOOKS];
+    static String[] bookAuthor = new String[MAX_BOOKS];
+    static double[] bookRating = new double[MAX_BOOKS];
+    static String[] bookReview = new String[MAX_BOOKS];
+    static String[] bookShelf = new String[MAX_BOOKS];
+    static int bookCount = 0;
+
+    static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        System.out.println("=======================================");
+        System.out.println("      WELCOME TO YOUR VIRTUAL BOOKSHELF");
+        System.out.println("=======================================");
+
+        boolean running = true;
+        while (running) {
+            System.out.println("\nWhat would you like to do?");
+            System.out.println("1. Browse a shelf");
+            System.out.println("2. View all books");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+
+            int mainChoice = readInt();
+
+            switch (mainChoice) {
+                case 1:
+                    browseShelf();
+                    break;
+                case 2:
+                    viewAllBooks();
+                    break;
+                case 3:
+                    running = false;
+                    System.out.println("Goodbye! Happy reading.");
+                    break;
+                default:
+                    System.out.println("Please enter a valid number.");
+            }
+        }
+        scanner.close();
+    }
+
+    // Lets the user pick a shelf, then add books to it or view it
+    static void browseShelf() {
+        System.out.println("\nChoose a shelf:");
+        for (int i = 0; i < shelves.length; i++) {
+            System.out.println((i + 1) + ". " + shelves[i]);
+        }
+        System.out.print("Enter shelf number: ");
+        int shelfChoice = readInt();
+
+        if (shelfChoice < 1 || shelfChoice > shelves.length) {
+            System.out.println("That shelf doesn't exist.");
+            return;
+        }
+
+        String selectedShelf = shelves[shelfChoice - 1];
+        boolean onShelf = true;
+
+        while (onShelf) {
+            System.out.println("\n--- " + selectedShelf + " shelf ---");
+            System.out.println("1. Add a book");
+            System.out.println("2. View this shelf");
+            System.out.println("3. Go back");
+            System.out.print("Enter your choice: ");
+
+            int shelfMenuChoice = readInt();
+
+            switch (shelfMenuChoice) {
+                case 1:
+                    addBook(selectedShelf);
+                    break;
+                case 2:
+                    viewShelf(selectedShelf);
+                    break;
+                case 3:
+                    onShelf = false;
+                    break;
+                default:
+                    System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+
+    // Adds a new book to the given shelf
+    static void addBook(String shelf) {
+        if (bookCount >= MAX_BOOKS) {
+            System.out.println("Sorry, your bookshelf is full!");
+            return;
+        }
+
+        System.out.print("Book title: ");
+        String title = scanner.nextLine();
+
+        System.out.print("Author: ");
+        String author = scanner.nextLine();
+
+        double rating = readRating();
+
+        System.out.print("Your thoughts on the book (press Enter to skip): ");
+        String review = scanner.nextLine();
+
+        bookTitle[bookCount] = title;
+        bookAuthor[bookCount] = author;
+        bookRating[bookCount] = rating;
+        bookReview[bookCount] = review;
+        bookShelf[bookCount] = shelf;
+        bookCount++;
+
+        System.out.println("\"" + title + "\" was added to your " + shelf + " shelf!");
+    }
+
+    // Asks for a rating between 0 and 5 in steps of 0.5, re-prompting until valid
+    static double readRating() {
+        double rating = -1;
+        boolean valid = false;
+
+        while (!valid) {
+            System.out.print("Rating (0 to 5, half stars allowed, e.g. 3.5): ");
+            String input = scanner.nextLine();
+
+            try {
+                rating = Double.parseDouble(input);
+                double doubled = rating * 2;
+                boolean isHalfStep = (doubled == Math.floor(doubled));
+
+                if (rating >= 0 && rating <= 5 && isHalfStep) {
+                    valid = true;
+                } else {
+                    System.out.println("Please enter a number between 0 and 5, in steps of 0.5.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("That's not a valid number. Try again.");
+            }
+        }
+        return rating;
+    }
+
+    // Prints every book currently on a given shelf
+    static void viewShelf(String shelf) {
+        System.out.println("\nBooks on your " + shelf + " shelf:");
+        boolean found = false;
+
+        for (int i = 0; i < bookCount; i++) {
+            if (bookShelf[i].equals(shelf)) {
+                found = true;
+                printBook(i);
+            }
+        }
+
+        if (!found) {
+            System.out.println("This shelf is empty. Add a book!");
+        }
+    }
+
+    // Prints every book across all shelves
+    static void viewAllBooks() {
+        System.out.println("\nYour entire bookshelf:");
+
+        if (bookCount == 0) {
+            System.out.println("You haven't added any books yet.");
+            return;
+        }
+
+        for (int i = 0; i < bookCount; i++) {
+            printBook(i);
+        }
+    }
+
+    // Prints one book nicely, including a star display
+    static void printBook(int index) {
+        System.out.println("---------------------------------");
+        System.out.println("Title:  " + bookTitle[index]);
+        System.out.println("Author: " + bookAuthor[index]);
+        System.out.println("Rating: " + starDisplay(bookRating[index]) + " (" + bookRating[index] + "/5)");
+        System.out.println("Shelf:  " + bookShelf[index]);
+        if (!bookReview[index].isEmpty()) {
+            System.out.println("Review: " + bookReview[index]);
+        }
+    }
+
+    // Turns a numeric rating into a string of stars, e.g. 3.5 -> "***+"
+    static String starDisplay(double rating) {
+        int fullStars = (int) rating;
+        boolean hasHalfStar = (rating - fullStars) >= 0.5;
+
+        StringBuilder stars = new StringBuilder();
+        for (int i = 0; i < fullStars; i++) {
+            stars.append("*");
+        }
+        if (hasHalfStar) {
+            stars.append("+");
+        }
+        return stars.toString();
+    }
+
+    // Safely reads an integer from the user, re-prompting if input is invalid
+    static int readInt() {
+        while (true) {
+            String input = scanner.nextLine();
+            try {
+                return Integer.parseInt(input.trim());
+            } catch (NumberFormatException e) {
+                System.out.print("Please enter a number: ");
+            }
+        }
+    }
+}
