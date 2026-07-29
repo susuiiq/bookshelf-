@@ -1,15 +1,7 @@
 import java.util.Scanner;
 
-/**
- * Virtual Bookshelf
- * ------------------
- * A simple console app where you pick a "shelf" (genre), add books to it
- * with a title, author, star rating (0-5, half stars allowed), and an
- * optional review, then browse what you've collected.
- *
- * Built using only: Scanner, arrays, loops, if/else, switch, and methods.
- */
-public class VirtualBookshelf {
+
+public class Bookshelf {
 
     static final int MAX_BOOKS = 100;
     static String[] shelves = {"Fantasy", "Romance", "Sci-Fi", "Mystery", "Non-Fiction"};
@@ -26,7 +18,7 @@ public class VirtualBookshelf {
 
     public static void main(String[] args) {
         System.out.println("=======================================");
-        System.out.println("      WELCOME TO YOUR VIRTUAL BOOKSHELF");
+        System.out.println("      WELCOME TO YOUR BOOKSHELF!!");
         System.out.println("=======================================");
 
         boolean running = true;
@@ -48,7 +40,7 @@ public class VirtualBookshelf {
                     break;
                 case 3:
                     running = false;
-                    System.out.println("Goodbye! Happy reading.");
+                    System.out.println("byee! enjoy your reading.");
                     break;
                 default:
                     System.out.println("Please enter a valid number.");
